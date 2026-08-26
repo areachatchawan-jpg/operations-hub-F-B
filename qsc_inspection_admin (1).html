@@ -1,0 +1,1120 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="theme-color" content="#1e3c72">
+    <title>QSC Inspection App - Admin & Inspection</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        html, body {
+            width: 100%;
+            height: 100%;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            min-height: 100vh;
+            color: #333;
+            overflow-x: hidden;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 100%;
+            padding: 10px;
+            margin: 0 auto;
+        }
+
+        /* ===== HEADER ===== */
+        header {
+            background: white;
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 15px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header-title {
+            font-size: 18px;
+            font-weight: bold;
+            color: #1e3c72;
+        }
+
+        .header-buttons {
+            display: flex;
+            gap: 8px;
+        }
+
+        .admin-badge {
+            background: #e74c3c;
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        /* ===== LOGIN SECTION ===== */
+        .login-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .login-box {
+            background: white;
+            border-radius: 16px;
+            padding: 40px;
+            max-width: 400px;
+            width: 100%;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            text-align: center;
+        }
+
+        .login-box h1 {
+            color: #1e3c72;
+            margin-bottom: 10px;
+            font-size: 24px;
+        }
+
+        .login-box p {
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 14px;
+        }
+
+        /* ===== FORMS ===== */
+        .form-group {
+            margin-bottom: 15px;
+            text-align: left;
+        }
+
+        .form-group label {
+            display: block;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            font-family: inherit;
+            transition: border-color 0.3s;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #2a5298;
+            box-shadow: 0 0 0 3px rgba(42, 82, 152, 0.1);
+        }
+
+        /* ===== BUTTONS ===== */
+        .btn {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 14px;
+            transition: all 0.3s;
+            width: 100%;
+            -webkit-appearance: none;
+            appearance: none;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #27ae60 0%, #229954 100%);
+            color: white;
+        }
+
+        .btn-primary:active {
+            transform: scale(0.98);
+        }
+
+        .btn-secondary {
+            background: #2a5298;
+            color: white;
+        }
+
+        .btn-danger {
+            background: #e74c3c;
+            color: white;
+        }
+
+        .btn-small {
+            padding: 6px 12px;
+            font-size: 12px;
+            width: auto;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .btn-group .btn {
+            flex: 1;
+            min-width: 100px;
+        }
+
+        /* ===== TABS ===== */
+        .tabs {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 15px;
+            overflow-x: auto;
+            padding-bottom: 10px;
+        }
+
+        .tab-btn {
+            padding: 8px 16px;
+            background: rgba(255,255,255,0.9);
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 13px;
+            white-space: nowrap;
+            transition: all 0.3s;
+            flex-shrink: 0;
+        }
+
+        .tab-btn.active {
+            background: white;
+            border-color: #2a5298;
+            color: #2a5298;
+        }
+
+        /* ===== CONTENT CARD ===== */
+        .content-card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            display: none;
+        }
+
+        .content-card.active {
+            display: block;
+        }
+
+        .content-card h3 {
+            color: #1e3c72;
+            margin-bottom: 15px;
+            font-size: 16px;
+        }
+
+        /* ===== TABLE ===== */
+        .table-container {
+            overflow-x: auto;
+            background: white;
+            border-radius: 12px;
+            padding: 10px;
+            margin-bottom: 15px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+        }
+
+        thead {
+            background: #f5f5f5;
+        }
+
+        th {
+            padding: 10px;
+            text-align: left;
+            font-weight: 600;
+            color: #333;
+            border-bottom: 2px solid #ddd;
+        }
+
+        td {
+            padding: 10px;
+            border-bottom: 1px solid #eee;
+        }
+
+        tr:hover {
+            background: #f9f9f9;
+        }
+
+        /* ===== MESSAGE ===== */
+        .message {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 2000;
+            padding: 12px 20px;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 14px;
+            animation: slideDown 0.3s ease;
+            max-width: 300px;
+        }
+
+        .message.success {
+            background: #27ae60;
+            color: white;
+        }
+
+        .message.error {
+            background: #e74c3c;
+            color: white;
+        }
+
+        .message.warning {
+            background: #f39c12;
+            color: white;
+        }
+
+        @keyframes slideDown {
+            from { transform: translateY(-20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        /* ===== ITEM LIST ===== */
+        .item-list {
+            list-style: none;
+        }
+
+        .item-list li {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px;
+            background: #f9f9f9;
+            border-radius: 8px;
+            margin-bottom: 8px;
+            gap: 10px;
+        }
+
+        .item-list input {
+            flex: 1;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 13px;
+        }
+
+        /* ===== RATING GROUP ===== */
+        .rating-group {
+            margin-bottom: 15px;
+        }
+
+        .rating-group label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #333;
+            font-size: 14px;
+        }
+
+        .rating-buttons {
+            display: flex;
+            gap: 8px;
+        }
+
+        .rating-btn {
+            flex: 1;
+            padding: 10px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            background: white;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 12px;
+            transition: all 0.3s;
+        }
+
+        .rating-btn.good {
+            border-color: #27ae60;
+            color: #27ae60;
+        }
+
+        .rating-btn.good.selected {
+            background: #27ae60;
+            color: white;
+        }
+
+        .rating-btn.medium {
+            border-color: #f39c12;
+            color: #f39c12;
+        }
+
+        .rating-btn.medium.selected {
+            background: #f39c12;
+            color: white;
+        }
+
+        .rating-btn.poor {
+            border-color: #e74c3c;
+            color: #e74c3c;
+        }
+
+        .rating-btn.poor.selected {
+            background: #e74c3c;
+            color: white;
+        }
+
+        /* ===== STATS ===== */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        @media (min-width: 768px) {
+            .stats-grid {
+                grid-template-columns: repeat(4, 1fr);
+            }
+        }
+
+        .stat-card {
+            background: white;
+            border-radius: 12px;
+            padding: 15px;
+            text-align: center;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+
+        .stat-value {
+            font-size: 24px;
+            font-weight: bold;
+            color: #2a5298;
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: #666;
+            margin-top: 5px;
+        }
+
+        /* ===== HIDDEN ===== */
+        .hidden {
+            display: none !important;
+        }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 600px) {
+            header {
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            .header-buttons {
+                width: 100%;
+            }
+
+            .btn-group {
+                flex-direction: column;
+            }
+
+            .btn-group .btn {
+                min-width: auto;
+            }
+
+            .tabs {
+                gap: 6px;
+            }
+
+            .tab-btn {
+                padding: 6px 12px;
+                font-size: 12px;
+            }
+
+            .rating-buttons {
+                flex-direction: column;
+            }
+        }
+
+        .info-box {
+            background: #e3f2fd;
+            border-left: 4px solid #2196F3;
+            padding: 12px;
+            border-radius: 4px;
+            margin-bottom: 15px;
+            font-size: 13px;
+            color: #1565c0;
+        }
+    </style>
+</head>
+<body>
+    <!-- ===== LOGIN SCREEN ===== -->
+    <div id="loginScreen" class="login-container">
+        <div class="login-box">
+            <div style="font-size: 50px; margin-bottom: 15px;">🔐</div>
+            <h1>Admin Login</h1>
+            <p>ตั้งค่าและจัดการระบบ QSC</p>
+            
+            <div class="form-group">
+                <label>รหัสผ่าน Admin</label>
+                <input type="password" id="adminPassword" placeholder="ใส่รหัสผ่าน" autocomplete="off">
+            </div>
+            
+            <button class="btn btn-primary" onclick="adminLogin()">เข้าสู่ระบบ Admin</button>
+            
+            <p style="margin-top: 20px; font-size: 12px; color: #999;">
+                ℹ️ รหัสผ่านเริ่มต้น: <strong>admin123</strong>
+            </p>
+        </div>
+    </div>
+
+    <!-- ===== MAIN APP ===== -->
+    <div id="mainApp" class="hidden">
+        <div class="container">
+            <!-- HEADER -->
+            <header>
+                <div class="header-title">🍽️ QSC Inspection System</div>
+                <div class="header-buttons">
+                    <span class="admin-badge">👤 Admin Mode</span>
+                    <button class="btn btn-secondary btn-small" onclick="logout()">ออกระบบ</button>
+                </div>
+            </header>
+
+            <!-- TABS -->
+            <div class="tabs">
+                <button class="tab-btn active" onclick="switchTab('inspection')">📋 ตรวจสอบ</button>
+                <button class="tab-btn" onclick="switchTab('branches')">🏪 จัดการสาขา</button>
+                <button class="tab-btn" onclick="switchTab('categories')">📝 จัดการหัวข้อ</button>
+                <button class="tab-btn" onclick="switchTab('history')">📊 ประวัติ</button>
+                <button class="tab-btn" onclick="switchTab('settings')">⚙️ ตั้งค่า</button>
+            </div>
+
+            <!-- TAB 1: INSPECTION -->
+            <div id="inspectionTab" class="content-card active">
+                <h3>📝 ตรวจสอบคุณภาพ QSC</h3>
+
+                <div class="form-group">
+                    <label>วันที่ตรวจสอบ</label>
+                    <input type="date" id="inspectionDate">
+                </div>
+
+                <div class="form-group">
+                    <label>เลือกสาขา</label>
+                    <select id="inspectionBranch">
+                        <option value="">-- เลือกสาขา --</option>
+                    </select>
+                </div>
+
+                <div id="categoriesContainer"></div>
+
+                <div class="btn-group">
+                    <button class="btn btn-primary" onclick="submitInspection()">💾 บันทึกการตรวจสอบ</button>
+                    <button class="btn btn-secondary" onclick="resetForm()">🔄 ล้างแบบฟอร์ม</button>
+                </div>
+            </div>
+
+            <!-- TAB 2: BRANCHES MANAGEMENT -->
+            <div id="branchesTab" class="content-card">
+                <h3>🏪 จัดการสาขา</h3>
+
+                <div class="info-box">
+                    💡 เพิ่ม ลบ หรือแก้ไขชื่อสาขาที่นี่
+                </div>
+
+                <div class="form-group">
+                    <label>ชื่อสาขาใหม่</label>
+                    <input type="text" id="newBranchName" placeholder="ใส่ชื่อสาขา เช่น Santa Fe - สยาม">
+                </div>
+
+                <button class="btn btn-primary" onclick="addBranch()" style="margin-bottom: 15px;">➕ เพิ่มสาขา</button>
+
+                <h4 style="color: #1e3c72; margin-bottom: 10px;">📋 รายชื่อสาขา:</h4>
+                <ul id="branchList" class="item-list"></ul>
+            </div>
+
+            <!-- TAB 3: CATEGORIES MANAGEMENT -->
+            <div id="categoriesTab" class="content-card">
+                <h3>📝 จัดการหัวข้อการตรวจสอบ</h3>
+
+                <div class="info-box">
+                    💡 เพิ่ม ลบ หรือแก้ไขหัวข้อการตรวจสอบ
+                </div>
+
+                <div class="form-group">
+                    <label>ชื่อหัวข้อใหม่</label>
+                    <input type="text" id="newCategoryName" placeholder="เช่น Quality, Service, Cleanliness">
+                </div>
+
+                <div class="form-group">
+                    <label>ไอคอน Emoji</label>
+                    <input type="text" id="newCategoryIcon" placeholder="เช่น 🏆 👥 🧹" maxlength="2">
+                </div>
+
+                <button class="btn btn-primary" onclick="addCategory()" style="margin-bottom: 15px;">➕ เพิ่มหัวข้อ</button>
+
+                <h4 style="color: #1e3c72; margin-bottom: 10px;">📋 รายชื่อหัวข้อ:</h4>
+                <div id="categoriesList"></div>
+            </div>
+
+            <!-- TAB 4: HISTORY -->
+            <div id="historyTab" class="content-card">
+                <h3>📊 ประวัติการตรวจสอบ</h3>
+
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>วันที่</th>
+                                <th>สาขา</th>
+                                <th>คะแนน</th>
+                                <th>สถานะ</th>
+                            </tr>
+                        </thead>
+                        <tbody id="historyTable">
+                            <tr><td colspan="4" style="text-align: center; color: #999;">ยังไม่มีข้อมูล</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="btn-group">
+                    <button class="btn btn-secondary" onclick="exportToJSON()">📥 ส่งออก JSON</button>
+                    <button class="btn btn-secondary" onclick="exportToExcel()">📊 ส่งออก Excel</button>
+                </div>
+            </div>
+
+            <!-- TAB 5: SETTINGS -->
+            <div id="settingsTab" class="content-card">
+                <h3>⚙️ ตั้งค่าระบบ</h3>
+
+                <div class="form-group">
+                    <label>ชื่อระบบ</label>
+                    <input type="text" id="systemTitle" placeholder="ชื่อระบบ">
+                </div>
+
+                <div class="form-group">
+                    <label>ชื่อบริษัท</label>
+                    <input type="text" id="systemCompany" placeholder="ชื่อบริษัท">
+                </div>
+
+                <div class="form-group">
+                    <label>รหัสผ่าน Admin (ใหม่)</label>
+                    <input type="password" id="newAdminPassword" placeholder="ปล่อยว่างถ้าไม่ต้องเปลี่ยน">
+                </div>
+
+                <div class="form-group">
+                    <label>เปิด/ปิด User Login (ปกติ)</label>
+                    <select id="allowUserLogin">
+                        <option value="true">✓ เปิด (ผู้ใช้ปกติสามารถเข้าได้)</option>
+                        <option value="false">✗ ปิด (Admin เท่านั้น)</option>
+                    </select>
+                </div>
+
+                <h4 style="color: #1e3c72; margin: 20px 0 10px;">📈 สถิติ</h4>
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-value" id="totalInspections">0</div>
+                        <div class="stat-label">ทั้งหมด</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="passCount">0</div>
+                        <div class="stat-label">ผ่าน</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="failCount">0</div>
+                        <div class="stat-label">ต้องปรับ</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="avgScore">0%</div>
+                        <div class="stat-label">เฉลี่ย</div>
+                    </div>
+                </div>
+
+                <div class="btn-group">
+                    <button class="btn btn-primary" onclick="saveSettings()">💾 บันทึกการตั้งค่า</button>
+                    <button class="btn btn-secondary" onclick="downloadBackup()">📥 ดาวน์โหลด Backup</button>
+                    <button class="btn btn-danger" onclick="clearAllData()">🗑️ ลบข้อมูลทั้งหมด</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ===== DEFAULT SETTINGS =====
+        const DEFAULT_SETTINGS = {
+            adminPassword: 'admin123',
+            systemTitle: 'ระบบตรวจสอบ QSC',
+            systemCompany: 'FAB Food Holding Co., Ltd.',
+            branches: [
+                'Santa Fe - BTS Thonglor',
+                'Santa Fe - CentralWorld',
+                'Easy Steak - Samsen',
+                'เจ๊แดง - สามย่าน',
+                'Yamachan Thailand'
+            ],
+            categories: [
+                { id: 'qual', name: 'Quality (คุณภาพ)', icon: '🏆', items: ['ความสดใหม่วัตถุดิบ', 'รสชาติและการปรุง'] },
+                { id: 'serv', name: 'Service (บริการ)', icon: '👥', items: ['ความเร็วบริการ', 'ความเป็นมิตร'] },
+                { id: 'clean', name: 'Cleanliness (ความสะอาด)', icon: '🧹', items: ['ห้องครัว', 'พื้นที่บริการ'] }
+            ],
+            allowUserLogin: true
+        };
+
+        // ===== STATE =====
+        let settings = { ...DEFAULT_SETTINGS };
+        let inspections = [];
+        let currentRatings = {};
+        let isAdminMode = false;
+
+        // ===== INIT =====
+        document.addEventListener('DOMContentLoaded', function() {
+            loadSettings();
+            setTodayDate();
+            renderBranches();
+            renderCategories();
+            updateHistoryTable();
+            updateStats();
+        });
+
+        // ===== ADMIN LOGIN =====
+        function adminLogin() {
+            const password = document.getElementById('adminPassword').value;
+            if (password === settings.adminPassword) {
+                isAdminMode = true;
+                document.getElementById('loginScreen').classList.add('hidden');
+                document.getElementById('mainApp').classList.remove('hidden');
+                showMessage('✓ เข้าสู่ระบบ Admin สำเร็จ', 'success');
+                updateSettingsUI();
+            } else {
+                showMessage('❌ รหัสผ่านไม่ถูกต้อง', 'error');
+            }
+        }
+
+        function logout() {
+            if (confirm('ต้องการออกจากระบบหรือไม่?')) {
+                isAdminMode = false;
+                document.getElementById('loginScreen').classList.remove('hidden');
+                document.getElementById('mainApp').classList.add('hidden');
+                document.getElementById('adminPassword').value = '';
+                showMessage('ออกจากระบบแล้ว', 'success');
+            }
+        }
+
+        // ===== TAB SWITCHING =====
+        function switchTab(tabName) {
+            document.querySelectorAll('.content-card').forEach(card => card.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+
+            document.getElementById(tabName + 'Tab').classList.add('active');
+            event.target.classList.add('active');
+
+            if (tabName === 'history') {
+                updateHistoryTable();
+            } else if (tabName === 'settings') {
+                updateStats();
+            }
+        }
+
+        // ===== BRANCHES MANAGEMENT =====
+        function renderBranches() {
+            const branchSelect = document.getElementById('inspectionBranch');
+            const branchList = document.getElementById('branchList');
+
+            branchSelect.innerHTML = '<option value="">-- เลือกสาขา --</option>' +
+                settings.branches.map((b, i) => `<option value="${b}">${b}</option>`).join('');
+
+            branchList.innerHTML = settings.branches.map((branch, idx) => `
+                <li>
+                    <input type="text" value="${branch}" onchange="updateBranch(${idx}, this.value)">
+                    <button class="btn btn-danger btn-small" onclick="removeBranch(${idx})">🗑️</button>
+                </li>
+            `).join('');
+        }
+
+        function addBranch() {
+            const name = document.getElementById('newBranchName').value.trim();
+            if (!name) {
+                showMessage('⚠️ ใส่ชื่อสาขา', 'error');
+                return;
+            }
+            if (settings.branches.includes(name)) {
+                showMessage('⚠️ สาขานี้มีอยู่แล้ว', 'error');
+                return;
+            }
+            settings.branches.push(name);
+            document.getElementById('newBranchName').value = '';
+            renderBranches();
+            saveSettings();
+            showMessage('✓ เพิ่มสาขาสำเร็จ', 'success');
+        }
+
+        function updateBranch(idx, newName) {
+            if (newName.trim()) {
+                settings.branches[idx] = newName;
+                saveSettings();
+            }
+        }
+
+        function removeBranch(idx) {
+            if (confirm('ลบสาขานี้หรือไม่?')) {
+                settings.branches.splice(idx, 1);
+                renderBranches();
+                saveSettings();
+                showMessage('✓ ลบสาขาสำเร็จ', 'success');
+            }
+        }
+
+        // ===== CATEGORIES MANAGEMENT =====
+        function renderCategories() {
+            const container = document.getElementById('categoriesList');
+
+            container.innerHTML = settings.categories.map((cat, catIdx) => `
+                <div style="background: #f9f9f9; padding: 15px; border-radius: 8px; margin-bottom: 15px;">
+                    <div style="margin-bottom: 10px;">
+                        <input type="text" placeholder="ชื่อหัวข้อ" value="${cat.name}" onchange="updateCategoryName(${catIdx}, this.value)" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; margin-bottom: 8px;">
+                    </div>
+
+                    <h5 style="color: #1e3c72; margin-bottom: 10px;">รายการตรวจสอบ:</h5>
+                    <ul style="list-style: none; margin-bottom: 10px;">
+                        ${cat.items.map((item, itemIdx) => `
+                            <li style="display: flex; gap: 8px; margin-bottom: 6px;">
+                                <input type="text" value="${item}" onchange="updateCategoryItem(${catIdx}, ${itemIdx}, this.value)" style="flex: 1; padding: 6px; border: 1px solid #ddd; border-radius: 4px; font-size: 12px;">
+                                <button class="btn btn-danger btn-small" onclick="removeCategoryItem(${catIdx}, ${itemIdx})">🗑️</button>
+                            </li>
+                        `).join('')}
+                    </ul>
+
+                    <input type="text" placeholder="เพิ่มรายการใหม่" id="newItem${catIdx}" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; margin-bottom: 8px;">
+                    <button class="btn btn-secondary btn-small" onclick="addCategoryItem(${catIdx})" style="margin-bottom: 10px;">➕ เพิ่มรายการ</button>
+
+                    <button class="btn btn-danger btn-small" onclick="removeCategory(${catIdx})">🗑️ ลบหัวข้อ</button>
+                </div>
+            `).join('');
+
+            renderCategoriesInspection();
+        }
+
+        function addCategory() {
+            const name = document.getElementById('newCategoryName').value.trim();
+            const icon = document.getElementById('newCategoryIcon').value.trim();
+
+            if (!name) {
+                showMessage('⚠️ ใส่ชื่อหัวข้อ', 'error');
+                return;
+            }
+
+            const newCat = {
+                id: 'cat_' + Date.now(),
+                name: name,
+                icon: icon || '📋',
+                items: ['รายการ 1', 'รายการ 2']
+            };
+
+            settings.categories.push(newCat);
+            document.getElementById('newCategoryName').value = '';
+            document.getElementById('newCategoryIcon').value = '';
+            renderCategories();
+            saveSettings();
+            showMessage('✓ เพิ่มหัวข้อสำเร็จ', 'success');
+        }
+
+        function updateCategoryName(idx, newName) {
+            if (newName.trim()) {
+                settings.categories[idx].name = newName;
+                saveSettings();
+                renderCategories();
+            }
+        }
+
+        function addCategoryItem(catIdx) {
+            const input = document.getElementById('newItem' + catIdx);
+            const itemName = input.value.trim();
+
+            if (!itemName) {
+                showMessage('⚠️ ใส่ชื่อรายการ', 'error');
+                return;
+            }
+
+            settings.categories[catIdx].items.push(itemName);
+            input.value = '';
+            saveSettings();
+            renderCategories();
+        }
+
+        function updateCategoryItem(catIdx, itemIdx, newName) {
+            if (newName.trim()) {
+                settings.categories[catIdx].items[itemIdx] = newName;
+                saveSettings();
+            }
+        }
+
+        function removeCategoryItem(catIdx, itemIdx) {
+            settings.categories[catIdx].items.splice(itemIdx, 1);
+            saveSettings();
+            renderCategories();
+        }
+
+        function removeCategory(idx) {
+            if (confirm('ลบหัวข้อนี้หรือไม่?')) {
+                settings.categories.splice(idx, 1);
+                renderCategories();
+                saveSettings();
+                showMessage('✓ ลบหัวข้อสำเร็จ', 'success');
+            }
+        }
+
+        // ===== RENDER INSPECTION FORM =====
+        function renderCategoriesInspection() {
+            const container = document.getElementById('categoriesContainer');
+
+            container.innerHTML = settings.categories.map((cat, catIdx) => `
+                <div style="background: ${['#f0f7ff', '#fff5f0', '#f0fff5'][catIdx % 3]}; padding: 15px; border-radius: 8px; margin-bottom: 15px;">
+                    <h4 style="color: #1e3c72; margin-bottom: 12px;">${cat.icon} ${cat.name}</h4>
+                    ${cat.items.map((item, itemIdx) => {
+                        const ratingId = `${cat.id}_${itemIdx}`;
+                        return `
+                            <div class="rating-group">
+                                <label>${item}</label>
+                                <div class="rating-buttons">
+                                    <button class="rating-btn good" onclick="setRating('${ratingId}', 'good', this)">✓ ดี</button>
+                                    <button class="rating-btn medium" onclick="setRating('${ratingId}', 'medium', this)">△ พอใจ</button>
+                                    <button class="rating-btn poor" onclick="setRating('${ratingId}', 'poor', this)">✗ ต้องปรับ</button>
+                                </div>
+                            </div>
+                        `;
+                    }).join('')}
+
+                    <div class="form-group">
+                        <label>หมายเหตุ ${cat.name}</label>
+                        <textarea id="notes_${cat.id}" placeholder="บันทึกรายละเอียด..." rows="2" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;"></textarea>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // ===== RATING SYSTEM =====
+        function setRating(id, rating, element) {
+            const buttons = element.parentElement.querySelectorAll('button');
+            buttons.forEach(btn => btn.classList.remove('selected'));
+            element.classList.add('selected');
+            currentRatings[id] = rating;
+        }
+
+        // ===== FORM SUBMISSION =====
+        function submitInspection() {
+            const date = document.getElementById('inspectionDate').value;
+            const branch = document.getElementById('inspectionBranch').value;
+
+            if (!date || !branch) {
+                showMessage('⚠️ เลือกวันที่และสาขา', 'error');
+                return;
+            }
+
+            const ratings = { ...currentRatings };
+            const scoreMap = { good: 100, medium: 70, poor: 40 };
+            const ratingValues = Object.values(ratings);
+            const score = ratingValues.length > 0 ? 
+                Math.round(ratingValues.reduce((sum, r) => sum + scoreMap[r], 0) / ratingValues.length) : 0;
+
+            const notes = {};
+            settings.categories.forEach(cat => {
+                notes[cat.id] = document.getElementById('notes_' + cat.id)?.value || '';
+            });
+
+            const inspection = {
+                id: Date.now(),
+                date: date,
+                branch: branch,
+                ratings: ratings,
+                notes: notes,
+                score: score
+            };
+
+            inspections.push(inspection);
+            saveInspections();
+            showMessage('✓ บันทึกการตรวจสอบสำเร็จ', 'success');
+            resetForm();
+            updateHistoryTable();
+        }
+
+        function resetForm() {
+            document.getElementById('inspectionDate').value = new Date().toISOString().split('T')[0];
+            document.getElementById('inspectionBranch').value = '';
+            document.querySelectorAll('.rating-btn.selected').forEach(btn => btn.classList.remove('selected'));
+            document.querySelectorAll('textarea').forEach(ta => ta.value = '');
+            currentRatings = {};
+        }
+
+        function setTodayDate() {
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('inspectionDate').value = today;
+        }
+
+        // ===== HISTORY & EXPORT =====
+        function updateHistoryTable() {
+            const tbody = document.getElementById('historyTable');
+
+            if (inspections.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="4" style="text-align: center; color: #999;">ยังไม่มีข้อมูล</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = [...inspections].reverse().map(insp => {
+                const status = insp.score >= 80 ? '✓ ผ่าน' : insp.score >= 60 ? '△ พอใจ' : '✗ ต้องปรับ';
+                const statusColor = insp.score >= 80 ? '#27ae60' : insp.score >= 60 ? '#f39c12' : '#e74c3c';
+                return `
+                    <tr>
+                        <td>${new Date(insp.date).toLocaleDateString('th-TH')}</td>
+                        <td>${insp.branch}</td>
+                        <td><strong>${insp.score}%</strong></td>
+                        <td><span style="color: ${statusColor}; font-weight: 600;">${status}</span></td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        function exportToJSON() {
+            const dataStr = JSON.stringify(inspections, null, 2);
+            const blob = new Blob([dataStr], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `QSC_${new Date().toISOString().split('T')[0]}.json`;
+            a.click();
+            showMessage('✓ ดาวน์โหลด JSON สำเร็จ', 'success');
+        }
+
+        function exportToExcel() {
+            if (inspections.length === 0) {
+                showMessage('⚠️ ไม่มีข้อมูล', 'error');
+                return;
+            }
+
+            const excelData = inspections.map(insp => ({
+                'วันที่': new Date(insp.date).toLocaleDateString('th-TH'),
+                'สาขา': insp.branch,
+                'คะแนน': insp.score + '%'
+            }));
+
+            const ws = XLSX.utils.json_to_sheet(excelData);
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, 'QSC');
+            XLSX.writeFile(wb, `QSC_${new Date().toISOString().split('T')[0]}.xlsx`);
+            showMessage('✓ ดาวน์โหลด Excel สำเร็จ', 'success');
+        }
+
+        // ===== SETTINGS =====
+        function updateSettingsUI() {
+            document.getElementById('systemTitle').value = settings.systemTitle;
+            document.getElementById('systemCompany').value = settings.systemCompany;
+            document.getElementById('allowUserLogin').value = settings.allowUserLogin;
+        }
+
+        function saveSettings() {
+            const newPassword = document.getElementById('newAdminPassword')?.value;
+            if (newPassword) {
+                settings.adminPassword = newPassword;
+                document.getElementById('newAdminPassword').value = '';
+            }
+
+            settings.systemTitle = document.getElementById('systemTitle').value;
+            settings.systemCompany = document.getElementById('systemCompany').value;
+            settings.allowUserLogin = document.getElementById('allowUserLogin').value === 'true';
+
+            localStorage.setItem('qscSettings', JSON.stringify(settings));
+            showMessage('✓ บันทึกการตั้งค่าสำเร็จ', 'success');
+        }
+
+        function updateStats() {
+            const total = inspections.length;
+            const pass = inspections.filter(i => i.score >= 80).length;
+            const fail = inspections.filter(i => i.score < 70).length;
+            const avg = total > 0 ? Math.round(inspections.reduce((sum, i) => sum + i.score, 0) / total) : 0;
+
+            document.getElementById('totalInspections').textContent = total;
+            document.getElementById('passCount').textContent = pass;
+            document.getElementById('failCount').textContent = fail;
+            document.getElementById('avgScore').textContent = avg + '%';
+        }
+
+        function downloadBackup() {
+            const backup = {
+                settings: settings,
+                inspections: inspections,
+                timestamp: new Date().toISOString()
+            };
+
+            const dataStr = JSON.stringify(backup, null, 2);
+            const blob = new Blob([dataStr], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `QSC_Backup_${new Date().getTime()}.json`;
+            a.click();
+            showMessage('✓ ดาวน์โหลด Backup สำเร็จ', 'success');
+        }
+
+        function clearAllData() {
+            if (confirm('⚠️ ลบข้อมูลการตรวจสอบทั้งหมด?')) {
+                if (confirm('⚠️ ยืนยันการลบข้อมูล?')) {
+                    inspections = [];
+                    saveInspections();
+                    updateHistoryTable();
+                    updateStats();
+                    showMessage('✓ ลบข้อมูลสำเร็จ', 'success');
+                }
+            }
+        }
+
+        // ===== STORAGE =====
+        function loadSettings() {
+            const saved = localStorage.getItem('qscSettings');
+            if (saved) {
+                settings = { ...DEFAULT_SETTINGS, ...JSON.parse(saved) };
+            }
+
+            const inspectionsSaved = localStorage.getItem('qscInspections');
+            if (inspectionsSaved) {
+                inspections = JSON.parse(inspectionsSaved);
+            }
+        }
+
+        function saveInspections() {
+            localStorage.setItem('qscInspections', JSON.stringify(inspections));
+        }
+
+        // ===== UTILITIES =====
+        function showMessage(text, type) {
+            const msg = document.createElement('div');
+            msg.className = `message ${type}`;
+            msg.textContent = text;
+            document.body.appendChild(msg);
+
+            setTimeout(() => {
+                msg.style.animation = 'slideDown 0.3s ease reverse';
+                setTimeout(() => msg.remove(), 300);
+            }, 2500);
+        }
+    </script>
+</body>
+</html>
