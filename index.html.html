@@ -1,0 +1,1841 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>ระบบตรวจสอบ QSC - Baiyoke Sky Hotel</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        html, body {
+            width: 100%;
+            height: 100%;
+            font-family: 'Segoe UI', 'Tahoma', 'Arial', sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            min-height: 100vh;
+            color: #333;
+            overflow-x: hidden;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 100%;
+            padding: 10px;
+            margin: 0 auto;
+        }
+
+        /* ===== HEADER ===== */
+        header {
+            background: white;
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 15px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .header-content {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+        }
+
+        .logo {
+            width: 80px;
+            height: auto;
+            max-height: 70px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+        
+        .logo img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+        }
+
+        .header-text {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .header-text h1 {
+            font-size: 18px;
+            color: #1e3c72;
+            margin: 0;
+            word-break: break-word;
+        }
+
+        .header-text p {
+            color: #666;
+            margin: 3px 0 0 0;
+            font-size: 12px;
+        }
+
+        .user-info {
+            font-size: 12px;
+            color: #666;
+            text-align: right;
+            flex-shrink: 0;
+        }
+
+        /* ===== LOGIN SECTION ===== */
+        .login-section {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            display: none;
+        }
+
+        .login-section.active {
+            display: block;
+        }
+
+        .login-section h2 {
+            color: #1e3c72;
+            margin-bottom: 20px;
+            font-size: 20px;
+            text-align: center;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            font-family: inherit;
+            transition: border-color 0.3s;
+            -webkit-appearance: none;
+            appearance: none;
+        }
+
+        .form-group select {
+            background: white url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%232a5298' d='M6 9L1 4h10z'/%3E%3C/svg%3E") no-repeat right 12px center;
+            padding-right: 35px;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #2a5298;
+            box-shadow: 0 0 0 3px rgba(42, 82, 152, 0.1);
+        }
+
+        /* ===== BUTTONS ===== */
+        .btn {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 14px;
+            transition: all 0.3s;
+            width: 100%;
+            -webkit-appearance: none;
+            appearance: none;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #27ae60 0%, #229954 100%);
+            color: white;
+        }
+
+        .btn-primary:active {
+            transform: scale(0.98);
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .btn-secondary {
+            background: #2a5298;
+            color: white;
+        }
+
+        .btn-secondary:active {
+            transform: scale(0.98);
+        }
+
+        .btn-danger {
+            background: #e74c3c;
+            color: white;
+        }
+
+        .btn-danger:active {
+            transform: scale(0.98);
+        }
+
+        .btn-small {
+            padding: 8px 12px;
+            font-size: 12px;
+            width: auto;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .btn-group .btn {
+            flex: 1;
+            min-width: 120px;
+        }
+
+        /* ===== MAIN CONTENT ===== */
+        .main-content {
+            display: none;
+        }
+
+        .main-content.active {
+            display: block;
+        }
+
+        .tab-buttons {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 15px;
+            overflow-x: auto;
+            padding-bottom: 10px;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .tab-btn {
+            padding: 8px 16px;
+            background: rgba(255,255,255,0.9);
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 13px;
+            white-space: nowrap;
+            transition: all 0.3s;
+            flex-shrink: 0;
+        }
+
+        .tab-btn.active {
+            background: white;
+            border-color: #2a5298;
+            color: #2a5298;
+        }
+
+        /* ===== CONTENT CARDS ===== */
+        .content-card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 15px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .content-card h3 {
+            color: #1e3c72;
+            margin-bottom: 15px;
+            font-size: 16px;
+        }
+
+        /* ===== RATING SYSTEM ===== */
+        .rating-group {
+            background: #f9f9f9;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+        }
+
+        .rating-group label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: #333;
+            font-size: 14px;
+        }
+
+        .rating-buttons {
+            display: flex;
+            gap: 8px;
+        }
+
+        .rating-btn {
+            flex: 1;
+            padding: 10px;
+            border: 2px solid #ddd;
+            background: white;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 600;
+            transition: all 0.3s;
+            text-align: center;
+        }
+
+        .rating-btn:active {
+            transform: scale(0.95);
+        }
+
+        .rating-btn.selected {
+            border-color: #27ae60;
+            background: #d5f4e6;
+            color: #27ae60;
+        }
+
+        .rating-btn.good { color: #27ae60; }
+        .rating-btn.medium { color: #f39c12; }
+        .rating-btn.poor { color: #e74c3c; }
+
+        /* ===== IMAGE UPLOAD ===== */
+        .image-section {
+            background: #f9f9f9;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+        }
+
+        .image-input-wrapper {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .image-input-wrapper input[type="file"] {
+            display: none;
+        }
+
+        .image-input-label {
+            display: block;
+            background: #2a5298;
+            color: white;
+            padding: 12px;
+            border-radius: 8px;
+            text-align: center;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        #imageContainer {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .image-preview {
+            position: relative;
+            width: 80px;
+            height: 80px;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .image-preview img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .remove-image {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background: #e74c3c;
+            color: white;
+            border: none;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 20px;
+            padding: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* ===== HISTORY TABLE ===== */
+        .search-section {
+            background: white;
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 15px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .search-section input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 14px;
+            margin-bottom: 10px;
+        }
+
+        .search-section .btn-group {
+            display: flex;
+            gap: 10px;
+        }
+
+        .search-section .btn {
+            flex: 1;
+            padding: 10px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+        }
+
+        table th {
+            background: #2a5298;
+            color: white;
+            padding: 12px;
+            text-align: left;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        table td {
+            padding: 12px;
+            border-bottom: 1px solid #eee;
+            font-size: 12px;
+        }
+
+        table tbody tr:hover {
+            background: #f9f9f9;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        .status-complete {
+            background: #d5f4e6;
+            color: #27ae60;
+        }
+
+        /* ===== ADMIN SECTION ===== */
+        .admin-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .admin-stat {
+            background: linear-gradient(135deg, #2a5298 0%, #1e3c72 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .admin-stat-value {
+            font-size: 32px;
+            font-weight: bold;
+            margin: 10px 0;
+        }
+
+        .admin-stat-label {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        /* ===== MODAL ===== */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            max-width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .modal-header h2 {
+            color: #1e3c72;
+            margin: 0;
+            font-size: 18px;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: #999;
+        }
+
+        /* ===== MESSAGE ===== */
+        .message {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 15px 20px;
+            border-radius: 8px;
+            font-weight: 600;
+            z-index: 2000;
+            animation: slideDown 0.3s ease;
+            max-width: 90%;
+        }
+
+        .message.success {
+            background: #27ae60;
+            color: white;
+        }
+
+        .message.error {
+            background: #e74c3c;
+            color: white;
+        }
+
+        @keyframes slideDown {
+            from {
+                transform: translateX(-50%) translateY(-100px);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(-50%) translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .loading.active {
+            display: block;
+        }
+
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #2a5298;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- HEADER -->
+        <header>
+            <div class="header-content">
+                <div class="logo">
+                    <img src="baiyoke_logo.jpeg" alt="Baiyoke Sky Hotel">
+                </div>
+                <div class="header-text">
+                    <h1>ระบบตรวจสอบ QSC</h1>
+                    <p>Baiyoke Sky Hotel</p>
+                </div>
+                <div class="user-info">
+                    <div id="userName">-</div>
+                    <div id="userBranch" style="font-size: 11px; margin-top: 3px;">-</div>
+                    <button class="btn btn-small btn-danger" onclick="logout()" style="margin-top: 5px; padding: 4px 8px; font-size: 10px; width: 60px;">ออก</button>
+                </div>
+            </div>
+        </header>
+
+        <!-- LOGIN SECTION -->
+        <section class="login-section active" id="loginSection">
+            <h2>🔐 เข้าสู่ระบบ</h2>
+            <form onsubmit="handleLogin(event)">
+                <div class="form-group">
+                    <label>ชื่อผู้ใช้</label>
+                    <input type="text" id="username" placeholder="ระบุชื่อผู้ใช้" required>
+                </div>
+                <div class="form-group">
+                    <label>รหัสผ่าน</label>
+                    <input type="password" id="password" placeholder="ระบุรหัสผ่าน" required>
+                </div>
+                <div class="form-group">
+                    <label>สาขา</label>
+                    <select id="branch" required>
+                        <option value="">-- เลือกสาขา --</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn btn-primary">เข้าสู่ระบบ</button>
+            </form>
+        </section>
+
+        <!-- MAIN CONTENT -->
+        <section class="main-content" id="mainContent">
+            <!-- TABS -->
+            <div class="tab-buttons">
+                <button class="tab-btn active" onclick="switchTab(event, 'inspection')">✅ ตรวจสอบ</button>
+                <button class="tab-btn" onclick="switchTab(event, 'history')">📊 ประวัติ</button>
+                <button class="tab-btn" onclick="switchTab(event, 'admin')">⚙️ ตั้งค่า</button>
+            </div>
+
+            <!-- TAB 1: INSPECTION -->
+            <div id="tab-inspection" class="tab-content">
+                <div class="content-card">
+                    <h3>📋 วันที่ตรวจสอบ</h3>
+                    <div class="form-group">
+                        <input type="date" id="inspectionDate">
+                    </div>
+                </div>
+
+                <!-- DYNAMIC CATEGORIES -->
+                <div id="dynamicCategoriesContainer">
+                    <!-- Categories จะถูก render ที่นี่ -->
+                </div>
+
+                <!-- QUALITY (HIDDEN - kept for backward compatibility) -->
+                <div class="content-card" style="display: none;">
+                    <h3>🍽️ Quality (คุณภาพ)</h3>
+                    <div class="rating-group">
+                        <label>ความสะอาดของอาหาร</label>
+                        <div class="rating-buttons">
+                            <button class="rating-btn good" onclick="setRating('quality1', 'good', this)">✓ ดี</button>
+                            <button class="rating-btn medium" onclick="setRating('quality1', 'medium', this)">△ พอใจ</button>
+                            <button class="rating-btn poor" onclick="setRating('quality1', 'poor', this)">✗ ต้องปรับ</button>
+                        </div>
+                    </div>
+                    <div class="rating-group">
+                        <label>ปริมาณการให้อาหาร</label>
+                        <div class="rating-buttons">
+                            <button class="rating-btn good" onclick="setRating('quality2', 'good', this)">✓ ดี</button>
+                            <button class="rating-btn medium" onclick="setRating('quality2', 'medium', this)">△ พอใจ</button>
+                            <button class="rating-btn poor" onclick="setRating('quality2', 'poor', this)">✗ ต้องปรับ</button>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>หมายเหตุ</label>
+                        <textarea id="qualityNotes" placeholder="บันทึกหมายเหตุเพิ่มเติม..." rows="3"></textarea>
+                    </div>
+                </div>
+
+                <!-- SERVICE -->
+                <div class="content-card">
+                    <h3>😊 Service (บริการ)</h3>
+                    <div class="rating-group">
+                        <label>ความเป็นมิตรของพนักงาน</label>
+                        <div class="rating-buttons">
+                            <button class="rating-btn good" onclick="setRating('service1', 'good', this)">✓ ดี</button>
+                            <button class="rating-btn medium" onclick="setRating('service1', 'medium', this)">△ พอใจ</button>
+                            <button class="rating-btn poor" onclick="setRating('service1', 'poor', this)">✗ ต้องปรับ</button>
+                        </div>
+                    </div>
+                    <div class="rating-group">
+                        <label>ความเร็วในการให้บริการ</label>
+                        <div class="rating-buttons">
+                            <button class="rating-btn good" onclick="setRating('service2', 'good', this)">✓ ดี</button>
+                            <button class="rating-btn medium" onclick="setRating('service2', 'medium', this)">△ พอใจ</button>
+                            <button class="rating-btn poor" onclick="setRating('service2', 'poor', this)">✗ ต้องปรับ</button>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>หมายเหตุ</label>
+                        <textarea id="serviceNotes" placeholder="บันทึกหมายเหตุเพิ่มเติม..." rows="3"></textarea>
+                    </div>
+                </div>
+
+                <!-- CLEANLINESS -->
+                <div class="content-card">
+                    <h3>✨ Cleanliness (ความสะอาด)</h3>
+                    <div class="rating-group">
+                        <label>ความสะอาดพื้น/ผนัง</label>
+                        <div class="rating-buttons">
+                            <button class="rating-btn good" onclick="setRating('clean1', 'good', this)">✓ ดี</button>
+                            <button class="rating-btn medium" onclick="setRating('clean1', 'medium', this)">△ พอใจ</button>
+                            <button class="rating-btn poor" onclick="setRating('clean1', 'poor', this)">✗ ต้องปรับ</button>
+                        </div>
+                    </div>
+                    <div class="rating-group">
+                        <label>ความสะอาดเครื่องใช้</label>
+                        <div class="rating-buttons">
+                            <button class="rating-btn good" onclick="setRating('clean2', 'good', this)">✓ ดี</button>
+                            <button class="rating-btn medium" onclick="setRating('clean2', 'medium', this)">△ พอใจ</button>
+                            <button class="rating-btn poor" onclick="setRating('clean2', 'poor', this)">✗ ต้องปรับ</button>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>หมายเหตุ</label>
+                        <textarea id="cleanNotes" placeholder="บันทึกหมายเหตุเพิ่มเติม..." rows="3"></textarea>
+                    </div>
+                </div>
+
+                <!-- IMAGE UPLOAD -->
+                <div class="content-card">
+                    <h3>📷 อัพโหลดรูปภาพ</h3>
+                    <div class="image-section">
+                        <div class="image-input-wrapper">
+                            <label class="image-input-label" for="imageInput">+ เพิ่มรูปภาพ</label>
+                            <input type="file" id="imageInput" multiple accept="image/*" onchange="addImages(event)">
+                        </div>
+                        <div id="imageContainer"></div>
+                    </div>
+                </div>
+
+                <!-- SUBMIT BUTTON -->
+                <div class="content-card">
+                    <button class="btn btn-primary" onclick="submitInspection()">บันทึกการตรวจสอบ ✓</button>
+                    <button class="btn btn-secondary" onclick="resetForm()" style="margin-top: 10px;">ล้างแบบฟอร์ม</button>
+                </div>
+            </div>
+
+            <!-- TAB 2: HISTORY -->
+            <div id="tab-history" class="tab-content" style="display:none;">
+                <div class="search-section">
+                    <input type="text" id="searchInput" placeholder="🔍 ค้นหาตามวันที่หรือสาขา..." onkeyup="filterHistory()">
+                    <div class="btn-group">
+                        <button class="btn btn-secondary btn-small" onclick="exportToExcel()">📥 Export Excel</button>
+                        <button class="btn btn-secondary btn-small" onclick="refreshHistory()">🔄 รีเฟรช</button>
+                    </div>
+                </div>
+
+                <div class="content-card">
+                    <div class="loading" id="historyLoading">
+                        <div class="spinner"></div>
+                        <p>กำลังโหลดข้อมูล...</p>
+                    </div>
+                    <table id="historyTable" style="display:none;">
+                        <thead>
+                            <tr>
+                                <th>วันที่</th>
+                                <th>คะแนน</th>
+                                <th>สถานะ</th>
+                                <th>ดำเนินการ</th>
+                            </tr>
+                        </thead>
+                        <tbody id="historyBody">
+                        </tbody>
+                    </table>
+                    <div id="emptyMessage" style="text-align: center; padding: 30px; color: #999;">ยังไม่มีการตรวจสอบ</div>
+                </div>
+            </div>
+
+            <!-- TAB 3: ADMIN -->
+            <div id="tab-admin" class="tab-content" style="display:none;">
+                <div class="content-card">
+                    <h3>📊 สถิติการตรวจสอบ</h3>
+                    <div class="admin-grid">
+                        <div class="admin-stat">
+                            <div class="admin-stat-label">จำนวนการตรวจสอบทั้งหมด</div>
+                            <div class="admin-stat-value" id="totalInspections">0</div>
+                        </div>
+                        <div class="admin-stat">
+                            <div class="admin-stat-label">คะแนนเฉลี่ย</div>
+                            <div class="admin-stat-value" id="avgScore">0%</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="content-card">
+                    <h3>⚙️ ตั้งค่าทั่วไป</h3>
+                    <div class="form-group">
+                        <label>ชื่อเจ้าของระบบ</label>
+                        <input type="text" id="systemName" placeholder="Baiyoke Sky Hotel" value="Baiyoke Sky Hotel">
+                    </div>
+                    <div class="form-group">
+                        <label>ชื่อฝ่ายปฏิบัติการ</label>
+                        <input type="text" id="departmentName" placeholder="Operations Department" value="Operations Department">
+                    </div>
+                </div>
+
+                <div class="content-card">
+                    <h3>🏢 จัดการสาขา</h3>
+                    <p style="font-size: 12px; color: #666; margin-bottom: 15px;">🔧 เพิ่ม/ลบ/แก้ไขชื่อสาขาได้ตามต้องการ</p>
+                    <div id="branchesList" style="margin-bottom: 15px; max-height: 300px; overflow-y: auto;">
+                        <!-- Branches จะ render ที่นี่ -->
+                    </div>
+                    <div style="display: flex; gap: 10px; margin-bottom: 15px;">
+                        <input type="text" id="newBranchName" placeholder="ชื่อสาขาใหม่ (เช่น สาขาหนองแขม)" style="flex: 1; padding: 10px; border: 2px solid #ddd; border-radius: 8px;">
+                        <button class="btn btn-secondary btn-small" onclick="addBranch()" style="width: 100px; padding: 10px;">➕ เพิ่ม</button>
+                    </div>
+                    <button class="btn btn-primary" onclick="saveBranches()" style="margin-bottom: 10px;">💾 บันทึกสาขา</button>
+                </div>
+
+                <div class="content-card">
+                    <h3>📋 จัดการหัวข้อการตรวจสอบ</h3>
+                    <p style="font-size: 12px; color: #666; margin-bottom: 15px;">🔧 เพิ่ม/ลบ/แก้ไขหัวข้อการตรวจสอบได้ตามต้องการ</p>
+                    <div id="categoriesList" style="margin-bottom: 15px; max-height: 300px; overflow-y: auto;">
+                        <!-- Categories จะ render ที่นี่ -->
+                    </div>
+                    <div style="display: flex; gap: 10px; margin-bottom: 15px;">
+                        <input type="text" id="newCategoryName" placeholder="ชื่อหัวข้อใหม่ (เช่น 📍 Safety)" style="flex: 1; padding: 10px; border: 2px solid #ddd; border-radius: 8px;">
+                        <button class="btn btn-secondary btn-small" onclick="addCategory()" style="width: 100px; padding: 10px;">➕ เพิ่ม</button>
+                    </div>
+                    <button class="btn btn-primary" onclick="saveCategories()" style="margin-bottom: 10px;">💾 บันทึกหัวข้อ</button>
+                </div>
+
+                <div class="content-card">
+                    <h3>🔗 การเชื่อมต่อ Google Sheets</h3>
+                    <div class="form-group">
+                        <label>Google Apps Script URL</label>
+                        <input type="text" id="appsScriptUrl" placeholder="https://script.google.com/macros/d/...">
+                        <p style="font-size: 12px; color: #999; margin-top: 5px;">ใส่ URL ของ Web App ที่ Deploy แล้ว</p>
+                    </div>
+                </div>
+
+                <div class="content-card">
+                    <h3>📱 ประวัติการซิงค์</h3>
+                    <div style="background: #f9f9f9; padding: 15px; border-radius: 8px; margin-bottom: 15px;">
+                        <p style="margin: 0; font-size: 12px;">
+                            <strong>ครั้งสุดท้าย:</strong> <span id="lastSync">ยังไม่เคยซิงค์</span>
+                        </p>
+                        <p style="margin: 5px 0 0 0; font-size: 12px;">
+                            <strong>สถานะ:</strong> <span id="syncStatus">ไม่ใช้งาน</span>
+                        </p>
+                    </div>
+                </div>
+
+                <div class="content-card">
+                    <div class="btn-group">
+                        <button class="btn btn-primary" onclick="saveSettings()">💾 บันทึกการตั้งค่า</button>
+                        <button class="btn btn-secondary" onclick="testConnection()">🧪 ทดสอบการเชื่อมต่อ</button>
+                    </div>
+                </div>
+
+                <div class="content-card">
+                    <h3>📥 ส่งออกข้อมูล</h3>
+                    <div class="btn-group">
+                        <button class="btn btn-secondary" onclick="exportToJSON()">📊 Export JSON</button>
+                        <button class="btn btn-secondary" onclick="syncToGoogleSheets()">☁️ ซิงค์ไป Google Sheets</button>
+                    </div>
+                </div>
+
+                <div class="content-card">
+                    <h3>⚠️ อันตราย</h3>
+                    <button class="btn btn-danger" onclick="clearAllData()">🗑️ ลบข้อมูลทั้งหมด</button>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- DETAIL MODAL -->
+    <div class="modal" id="detailModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>📋 รายละเอียดการตรวจสอบ</h2>
+                <button class="modal-close" onclick="closeModal()">×</button>
+            </div>
+            <div id="detailContent"></div>
+        </div>
+    </div>
+
+    <!-- EDIT MODAL -->
+    <div class="modal" id="editModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>✏️ แก้ไขการตรวจสอบ</h2>
+                <button class="modal-close" onclick="closeEditModal()">×</button>
+            </div>
+            <form onsubmit="event.preventDefault(); saveEditInspection();">
+                <div class="form-group" style="margin-bottom: 15px;">
+                    <label>วันที่</label>
+                    <input type="date" id="editDate">
+                </div>
+
+                <div style="background: #f9f9f9; padding: 15px; border-radius: 8px; margin-bottom: 15px;">
+                    <h4>🍽️ Quality (คุณภาพ)</h4>
+                    <div class="form-group">
+                        <label>ความสะอาดของอาหาร</label>
+                        <select id="editQuality1">
+                            <option value="">-- เลือก --</option>
+                            <option value="good">✓ ดี</option>
+                            <option value="medium">△ พอใจ</option>
+                            <option value="poor">✗ ต้องปรับ</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>ปริมาณการให้อาหาร</label>
+                        <select id="editQuality2">
+                            <option value="">-- เลือก --</option>
+                            <option value="good">✓ ดี</option>
+                            <option value="medium">△ พอใจ</option>
+                            <option value="poor">✗ ต้องปรับ</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>หมายเหตุ</label>
+                        <textarea id="editQualityNotes" rows="2" placeholder="บันทึกหมายเหตุ..."></textarea>
+                    </div>
+                </div>
+
+                <div style="background: #f9f9f9; padding: 15px; border-radius: 8px; margin-bottom: 15px;">
+                    <h4>😊 Service (บริการ)</h4>
+                    <div class="form-group">
+                        <label>ความเป็นมิตรของพนักงาน</label>
+                        <select id="editService1">
+                            <option value="">-- เลือก --</option>
+                            <option value="good">✓ ดี</option>
+                            <option value="medium">△ พอใจ</option>
+                            <option value="poor">✗ ต้องปรับ</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>ความเร็วในการให้บริการ</label>
+                        <select id="editService2">
+                            <option value="">-- เลือก --</option>
+                            <option value="good">✓ ดี</option>
+                            <option value="medium">△ พอใจ</option>
+                            <option value="poor">✗ ต้องปรับ</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>หมายเหตุ</label>
+                        <textarea id="editServiceNotes" rows="2" placeholder="บันทึกหมายเหตุ..."></textarea>
+                    </div>
+                </div>
+
+                <div style="background: #f9f9f9; padding: 15px; border-radius: 8px; margin-bottom: 15px;">
+                    <h4>✨ Cleanliness (ความสะอาด)</h4>
+                    <div class="form-group">
+                        <label>ความสะอาดพื้น/ผนัง</label>
+                        <select id="editClean1">
+                            <option value="">-- เลือก --</option>
+                            <option value="good">✓ ดี</option>
+                            <option value="medium">△ พอใจ</option>
+                            <option value="poor">✗ ต้องปรับ</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>ความสะอาดเครื่องใช้</label>
+                        <select id="editClean2">
+                            <option value="">-- เลือก --</option>
+                            <option value="good">✓ ดี</option>
+                            <option value="medium">△ พอใจ</option>
+                            <option value="poor">✗ ต้องปรับ</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>หมายเหตุ</label>
+                        <textarea id="editCleanNotes" rows="2" placeholder="บันทึกหมายเหตุ..."></textarea>
+                    </div>
+                </div>
+
+                <div style="display: flex; gap: 10px;">
+                    <button type="submit" class="btn btn-primary" style="flex: 1;">💾 บันทึกการแก้ไข</button>
+                    <button type="button" class="btn btn-secondary" onclick="closeEditModal()" style="flex: 1;">ยกเลิก</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // ===== CONFIGURATION =====
+        let currentUser = null;
+        let ratings = {};
+        let images = [];
+        let inspections = [];
+        let allInspections = []; // สำหรับเก็บข้อมูลทั้งหมด
+        let branches = [
+            'สาขาศรีลัมพ์นี',
+            'สาขาสยาม',
+            'สาขาเอกมัย',
+            'สาขาพระราม 4'
+        ];
+        let inspectionCategories = [
+            {
+                id: 'quality',
+                name: '🍽️ Quality (คุณภาพ)',
+                icon: '🍽️',
+                subcategories: ['ความสะอาดของอาหาร', 'ปริมาณการให้อาหาร']
+            },
+            {
+                id: 'service',
+                name: '😊 Service (บริการ)',
+                icon: '😊',
+                subcategories: ['ความเป็นมิตรของพนักงาน', 'ความเร็วในการให้บริการ']
+            },
+            {
+                id: 'cleanliness',
+                name: '✨ Cleanliness (ความสะอาด)',
+                icon: '✨',
+                subcategories: ['ความสะอาดพื้น/ผนัง', 'ความสะอาดเครื่องใช้']
+            }
+        ];
+
+        // Load data on start
+        document.addEventListener('DOMContentLoaded', function() {
+            loadFromLocalStorage();
+            loadSettings();
+            renderDynamicInspectionForm();
+            setTodayDate();
+        });
+
+        // ===== LOGIN =====
+        function handleLogin(event) {
+            event.preventDefault();
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            const branch = document.getElementById('branch').value;
+
+            // Simple validation (ในการใช้งานจริง ต้องตรวจสอบกับ backend)
+            if (username && password && branch) {
+                currentUser = {
+                    username: username,
+                    branch: branch
+                };
+
+                document.getElementById('userName').textContent = username;
+                document.getElementById('userBranch').textContent = branch;
+
+                document.getElementById('loginSection').classList.remove('active');
+                document.getElementById('mainContent').classList.add('active');
+
+                loadInspections();
+            } else {
+                showMessage('กรุณากรอกข้อมูลให้ครบถ้วน', 'error');
+            }
+        }
+
+        // ===== LOGOUT =====
+        function logout() {
+            currentUser = null;
+            ratings = {};
+            images = [];
+            document.getElementById('loginSection').classList.add('active');
+            document.getElementById('mainContent').classList.remove('active');
+            document.getElementById('username').value = '';
+            document.getElementById('password').value = '';
+        }
+
+        // ===== TAB SWITCHING =====
+        function switchTab(event, tabName) {
+            // Remove active class from all tabs
+            document.querySelectorAll('.tab-content').forEach(tab => tab.style.display = 'none');
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+
+            // Add active class to selected tab
+            const tabElement = document.getElementById('tab-' + tabName);
+            if (tabElement) {
+                tabElement.style.display = 'block';
+            }
+
+            event.target.classList.add('active');
+
+            // Update content
+            if (tabName === 'history') {
+                refreshHistory();
+            } else if (tabName === 'admin') {
+                updateAdminStats();
+            }
+        }
+
+        // ===== RATING SYSTEM =====
+        function setRating(ratingId, value, element) {
+            ratings[ratingId] = value;
+            element.parentElement.querySelectorAll('.rating-btn').forEach(btn => {
+                btn.classList.remove('selected');
+            });
+            element.classList.add('selected');
+        }
+
+        // ===== IMAGE HANDLING =====
+        function addImages(event) {
+            const files = Array.from(event.target.files);
+            files.forEach(file => {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    images.push(e.target.result);
+                    renderImagePreview();
+                };
+                reader.readAsDataURL(file);
+            });
+            document.getElementById('imageInput').value = '';
+        }
+
+        function renderImagePreview() {
+            const container = document.getElementById('imageContainer');
+            container.innerHTML = images.map((img, index) => `
+                <div class="image-preview">
+                    <img src="${img}" alt="preview">
+                    <button class="remove-image" onclick="removeImage(${index})">×</button>
+                </div>
+            `).join('');
+        }
+
+        function removeImage(index) {
+            images.splice(index, 1);
+            renderImagePreview();
+        }
+
+        // ===== FORM SUBMISSION =====
+        function submitInspection() {
+            const date = document.getElementById('inspectionDate').value;
+
+            if (!date) {
+                showMessage('กรุณาเลือกวันที่ตรวจสอบ', 'error');
+                return;
+            }
+
+            if (Object.keys(ratings).length === 0) {
+                showMessage('กรุณาให้คะแนนอย่างน้อยหนึ่งรายการ', 'error');
+                return;
+            }
+
+            const score = calculateScore();
+            
+            // Collect notes from all categories
+            const notes = {};
+            inspectionCategories.forEach(cat => {
+                const notesId = `${cat.id}_notes`;
+                const notesField = document.getElementById(notesId);
+                if (notesField) {
+                    notes[cat.id] = notesField.value;
+                }
+            });
+
+            const inspection = {
+                id: Date.now(),
+                branch: currentUser.username,
+                date: date,
+                ratings: {...ratings},
+                notes: notes,
+                score: score,
+                images: images.length,
+                timestamp: new Date(),
+                categories: inspectionCategories.map(c => c.name)
+            };
+
+            inspections.push(inspection);
+            saveToLocalStorage();
+
+            // ส่งไป Google Sheets (ถ้าตั้งค่า URL แล้ว)
+            const appsScriptUrl = localStorage.getItem('appsScriptUrl');
+            if (appsScriptUrl) {
+                sendToGoogleSheets(inspection);
+                const syncTime = new Date().toLocaleString('th-TH');
+                localStorage.setItem('lastSync', syncTime);
+                document.getElementById('lastSync').textContent = syncTime;
+            }
+
+            showMessage('บันทึกการตรวจสอบสำเร็จ ✓', 'success');
+            resetForm();
+        }
+
+        function calculateScore() {
+            if (Object.keys(ratings).length === 0) return 0;
+            
+            let totalPoints = 0;
+            const scoreMap = { good: 3, medium: 2, poor: 1 };
+
+            Object.values(ratings).forEach(rating => {
+                totalPoints += scoreMap[rating] || 0;
+            });
+
+            const maxPoints = Object.keys(ratings).length * 3;
+            return Math.round((totalPoints / maxPoints) * 100);
+        }
+
+        function resetForm() {
+            ratings = {};
+            images = [];
+            document.querySelectorAll('.rating-btn').forEach(btn => btn.classList.remove('selected'));
+            
+            // Clear all notes fields
+            document.querySelectorAll('textarea[id$="_notes"]').forEach(field => field.value = '');
+            
+            // Clear old notes fields (for backward compatibility)
+            const oldNotes = ['qualityNotes', 'serviceNotes', 'cleanNotes'];
+            oldNotes.forEach(id => {
+                const field = document.getElementById(id);
+                if (field) field.value = '';
+            });
+            
+            document.getElementById('imageContainer').innerHTML = '';
+            setTodayDate();
+        }
+
+        // ===== HISTORY =====
+        function refreshHistory() {
+            loadInspections();
+            updateHistoryTable();
+        }
+
+        function loadInspections() {
+            document.getElementById('historyLoading').classList.add('active');
+            document.getElementById('historyTable').style.display = 'none';
+
+            // โหลดจาก localStorage ก่อน
+            loadFromLocalStorage();
+
+            // ลองโหลดจาก Google Sheets
+            const appsScriptUrl = localStorage.getItem('appsScriptUrl');
+            if (appsScriptUrl) {
+                fetch(appsScriptUrl)
+                    .then(res => res.json())
+                    .then(data => {
+                        if (data.success && data.data) {
+                            allInspections = data.data;
+                        }
+                    })
+                    .catch(err => console.log('ไม่สามารถเชื่อมต่อ Google Sheets'))
+                    .finally(() => {
+                        document.getElementById('historyLoading').classList.remove('active');
+                        updateHistoryTable();
+                        document.getElementById('historyTable').style.display = 'table';
+                    });
+            } else {
+                document.getElementById('historyLoading').classList.remove('active');
+                updateHistoryTable();
+                document.getElementById('historyTable').style.display = 'table';
+            }
+        }
+
+        function updateHistoryTable() {
+            const tbody = document.getElementById('historyBody');
+            const displayData = allInspections.length > 0 ? allInspections : inspections;
+
+            if (displayData.length === 0) {
+                document.getElementById('emptyMessage').style.display = 'block';
+                document.getElementById('historyTable').style.display = 'none';
+                return;
+            }
+
+            document.getElementById('emptyMessage').style.display = 'none';
+
+            tbody.innerHTML = displayData.map(insp => `
+                <tr>
+                    <td style="font-size: 12px;">${new Date(insp.date).toLocaleDateString('th-TH')}</td>
+                    <td><strong>${insp.score}%</strong></td>
+                    <td><span class="status-badge status-complete">สำเร็จ</span></td>
+                    <td>
+                        <div style="display: flex; gap: 5px;">
+                            <button class="btn btn-small btn-secondary" onclick="viewDetail(${insp.id})" style="font-size: 11px; padding: 6px 10px;">👁️</button>
+                            <button class="btn btn-small btn-secondary" onclick="openEditModal(${insp.id})" style="font-size: 11px; padding: 6px 10px;">✏️</button>
+                            <button class="btn btn-small btn-danger" onclick="deleteInspection(${insp.id})" style="font-size: 11px; padding: 6px 10px;">🗑️</button>
+                        </div>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function filterHistory() {
+            const searchText = document.getElementById('searchInput').value.toLowerCase();
+            const displayData = allInspections.length > 0 ? allInspections : inspections;
+
+            const tbody = document.getElementById('historyBody');
+            tbody.innerHTML = displayData.filter(insp => {
+                const dateStr = new Date(insp.date).toLocaleDateString('th-TH').toLowerCase();
+                const branchStr = (insp.branch || '').toLowerCase();
+                return dateStr.includes(searchText) || branchStr.includes(searchText);
+            }).map(insp => `
+                <tr>
+                    <td style="font-size: 12px;">${new Date(insp.date).toLocaleDateString('th-TH')}</td>
+                    <td><strong>${insp.score}%</strong></td>
+                    <td><span class="status-badge status-complete">สำเร็จ</span></td>
+                    <td>
+                        <div style="display: flex; gap: 5px;">
+                            <button class="btn btn-small btn-secondary" onclick="viewDetail(${insp.id})" style="font-size: 11px; padding: 6px 10px;">👁️</button>
+                            <button class="btn btn-small btn-secondary" onclick="openEditModal(${insp.id})" style="font-size: 11px; padding: 6px 10px;">✏️</button>
+                            <button class="btn btn-small btn-danger" onclick="deleteInspection(${insp.id})" style="font-size: 11px; padding: 6px 10px;">🗑️</button>
+                        </div>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function viewDetail(id) {
+            const displayData = allInspections.length > 0 ? allInspections : inspections;
+            const insp = displayData.find(i => i.id === id);
+            if (!insp) return;
+
+            const scoreMap = { good: '✓ ดี', medium: '△ พอใจ', poor: '✗ ต้องปรับปรุง' };
+
+            let html = `
+                <div style="font-size: 14px;">
+                    <p><strong>สาขา:</strong> ${insp.branch}</p>
+                    <p><strong>วันที่:</strong> ${new Date(insp.date).toLocaleDateString('th-TH')}</p>
+                    <p><strong>คะแนนรวม:</strong> <span style="font-size: 20px; color: #27ae60;">${insp.score}%</span></p>
+
+                    <div style="margin-top: 15px;">
+                        <h4>📋 รายละเอียด Quality:</h4>
+                        <p>ความสะอาด: ${scoreMap[insp.ratings.quality1]}</p>
+                        <p>ปริมาณ: ${scoreMap[insp.ratings.quality2]}</p>
+                        ${insp.notes.quality ? `<p>หมายเหตุ: ${insp.notes.quality}</p>` : ''}
+                    </div>
+
+                    <div style="margin-top: 15px;">
+                        <h4>😊 รายละเอียด Service:</h4>
+                        <p>ความเป็นมิตร: ${scoreMap[insp.ratings.service1]}</p>
+                        <p>ความเร็ว: ${scoreMap[insp.ratings.service2]}</p>
+                        ${insp.notes.service ? `<p>หมายเหตุ: ${insp.notes.service}</p>` : ''}
+                    </div>
+
+                    <div style="margin-top: 15px;">
+                        <h4>✨ รายละเอียด Cleanliness:</h4>
+                        <p>พื้น/ผนัง: ${scoreMap[insp.ratings.clean1]}</p>
+                        <p>เครื่องใช้: ${scoreMap[insp.ratings.clean2]}</p>
+                        ${insp.notes.cleanliness ? `<p>หมายเหตุ: ${insp.notes.cleanliness}</p>` : ''}
+                    </div>
+
+                    <p style="margin-top: 15px; font-size: 12px; color: #999;">รูปภาพที่อัพโหลด: ${insp.images}</p>
+
+                    <div style="margin-top: 20px; padding-top: 15px; border-top: 1px solid #eee; display: flex; gap: 10px;">
+                        <button class="btn btn-secondary btn-small" onclick="openEditModal(${id})" style="flex: 1;">✏️ แก้ไข</button>
+                        <button class="btn btn-danger btn-small" onclick="deleteInspection(${id})" style="flex: 1;">🗑️ ลบ</button>
+                    </div>
+                </div>
+            `;
+
+            document.getElementById('detailContent').innerHTML = html;
+            document.getElementById('detailModal').classList.add('active');
+        }
+
+        function openEditModal(id) {
+            const displayData = allInspections.length > 0 ? allInspections : inspections;
+            const insp = displayData.find(i => i.id === id);
+            if (!insp) return;
+
+            // เก็บ ID ที่กำลังแก้ไข
+            window.editingId = id;
+
+            // ตั้งค่าฟอร์ม
+            document.getElementById('editDate').value = insp.date;
+            document.getElementById('editQuality1').value = insp.ratings.quality1 || '';
+            document.getElementById('editQuality2').value = insp.ratings.quality2 || '';
+            document.getElementById('editService1').value = insp.ratings.service1 || '';
+            document.getElementById('editService2').value = insp.ratings.service2 || '';
+            document.getElementById('editClean1').value = insp.ratings.clean1 || '';
+            document.getElementById('editClean2').value = insp.ratings.clean2 || '';
+            document.getElementById('editQualityNotes').value = insp.notes.quality || '';
+            document.getElementById('editServiceNotes').value = insp.notes.service || '';
+            document.getElementById('editCleanNotes').value = insp.notes.cleanliness || '';
+
+            // ปิด detail modal และเปิด edit modal
+            closeModal();
+            document.getElementById('editModal').classList.add('active');
+        }
+
+        function saveEditInspection() {
+            const insp = inspections.find(i => i.id === window.editingId);
+            if (!insp) {
+                showMessage('ไม่พบข้อมูล', 'error');
+                return;
+            }
+
+            // อัปเดตข้อมูล
+            insp.date = document.getElementById('editDate').value;
+            insp.ratings.quality1 = document.getElementById('editQuality1').value;
+            insp.ratings.quality2 = document.getElementById('editQuality2').value;
+            insp.ratings.service1 = document.getElementById('editService1').value;
+            insp.ratings.service2 = document.getElementById('editService2').value;
+            insp.ratings.clean1 = document.getElementById('editClean1').value;
+            insp.ratings.clean2 = document.getElementById('editClean2').value;
+            insp.notes.quality = document.getElementById('editQualityNotes').value;
+            insp.notes.service = document.getElementById('editServiceNotes').value;
+            insp.notes.cleanliness = document.getElementById('editCleanNotes').value;
+
+            // คำนวณคะแนนใหม่
+            const scoreMap = { good: 3, medium: 2, poor: 1 };
+            let totalPoints = 0;
+            Object.values(insp.ratings).forEach(rating => {
+                totalPoints += scoreMap[rating] || 0;
+            });
+            insp.score = Math.round((totalPoints / (Object.keys(insp.ratings).length * 3)) * 100);
+
+            // บันทึก
+            saveToLocalStorage();
+
+            // ส่งไป Google Sheets
+            const appsScriptUrl = localStorage.getItem('appsScriptUrl');
+            if (appsScriptUrl) {
+                sendToGoogleSheets(insp);
+            }
+
+            showMessage('บันทึกการแก้ไขสำเร็จ ✓', 'success');
+            document.getElementById('editModal').classList.remove('active');
+            refreshHistory();
+        }
+
+        function deleteInspection(id) {
+            if (confirm('⚠️ คุณต้องการลบการตรวจสอบนี้ใช่หรือไม่?')) {
+                if (confirm('⚠️ คุณแน่ใจหรือไม่? การกระทำนี้ไม่สามารถย้อนกลับได้')) {
+                    inspections = inspections.filter(i => i.id !== id);
+                    allInspections = allInspections.filter(i => i.id !== id);
+                    saveToLocalStorage();
+                    showMessage('ลบข้อมูลสำเร็จ', 'success');
+                    closeModal();
+                    refreshHistory();
+                }
+            }
+        }
+
+        // ===== ADMIN =====
+        function updateAdminStats() {
+            const displayData = allInspections.length > 0 ? allInspections : inspections;
+            document.getElementById('totalInspections').textContent = displayData.length;
+
+            if (displayData.length > 0) {
+                const avgScore = Math.round(
+                    displayData.reduce((sum, insp) => sum + insp.score, 0) / displayData.length
+                );
+                document.getElementById('avgScore').textContent = avgScore + '%';
+            } else {
+                document.getElementById('avgScore').textContent = '0%';
+            }
+        }
+
+        function saveSettings() {
+            const systemName = document.getElementById('systemName').value;
+            const departmentName = document.getElementById('departmentName').value;
+            const url = document.getElementById('appsScriptUrl').value;
+
+            if (!systemName || !departmentName) {
+                showMessage('กรุณากรอกข้อมูลให้ครบถ้วน', 'error');
+                return;
+            }
+
+            localStorage.setItem('systemName', systemName);
+            localStorage.setItem('departmentName', departmentName);
+            localStorage.setItem('appsScriptUrl', url);
+            
+            showMessage('บันทึกการตั้งค่าสำเร็จ ✓', 'success');
+        }
+
+        function testConnection() {
+            const url = document.getElementById('appsScriptUrl').value;
+            if (!url) {
+                showMessage('กรุณาใส่ URL ก่อน', 'error');
+                return;
+            }
+
+            showMessage('🔄 กำลังทดสอบการเชื่อมต่อ...', 'success');
+            
+            fetch(url)
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success) {
+                        showMessage('✅ เชื่อมต่อสำเร็จ!', 'success');
+                        document.getElementById('lastSync').textContent = new Date().toLocaleString('th-TH');
+                        document.getElementById('syncStatus').textContent = '✓ ทำงาน';
+                    } else {
+                        showMessage('❌ การเชื่อมต่อล้มเหลว: ' + (data.error || 'Unknown error'), 'error');
+                    }
+                })
+                .catch(err => {
+                    showMessage('❌ ข้อผิดพลาด: ' + err.message, 'error');
+                });
+        }
+
+        // Load settings on page load
+        function loadSettings() {
+            const systemName = localStorage.getItem('systemName') || 'Baiyoke Sky Hotel';
+            const departmentName = localStorage.getItem('departmentName') || 'Operations Department';
+            const appsScriptUrl = localStorage.getItem('appsScriptUrl') || '';
+            const lastSync = localStorage.getItem('lastSync') || 'ยังไม่เคยซิงค์';
+
+            document.getElementById('systemName').value = systemName;
+            document.getElementById('departmentName').value = departmentName;
+            document.getElementById('appsScriptUrl').value = appsScriptUrl;
+            document.getElementById('lastSync').textContent = lastSync;
+            
+            if (appsScriptUrl) {
+                document.getElementById('syncStatus').textContent = '✓ ตั้งค่าแล้ว';
+            }
+
+            // Load branches
+            loadBranches();
+            renderBranches();
+            updateBranchDropdown();
+        }
+
+        // ===== BRANCHES MANAGEMENT =====
+        function loadBranches() {
+            const saved = localStorage.getItem('branches');
+            if (saved) {
+                branches = JSON.parse(saved);
+            }
+        }
+
+        function renderBranches() {
+            const container = document.getElementById('branchesList');
+            if (!container) return;
+
+            container.innerHTML = branches.map((branch, idx) => `
+                <div style="background: #f9f9f9; padding: 12px; border-radius: 8px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center;">
+                    <input type="text" value="${branch}" onchange="updateBranchName(${idx}, this.value)" style="flex: 1; padding: 8px; border: 1px solid #ddd; border-radius: 4px; font-weight: 500;">
+                    <button class="btn btn-danger btn-small" onclick="removeBranch(${idx})" style="margin-left: 10px; padding: 6px 12px; font-size: 12px;">🗑️</button>
+                </div>
+            `).join('');
+        }
+
+        function addBranch() {
+            const input = document.getElementById('newBranchName');
+            const name = input.value.trim();
+            
+            if (!name) {
+                showMessage('กรุณาใส่ชื่อสาขา', 'error');
+                return;
+            }
+
+            if (branches.includes(name)) {
+                showMessage('สาขานี้มีอยู่แล้ว', 'error');
+                return;
+            }
+
+            branches.push(name);
+            input.value = '';
+            renderBranches();
+            updateBranchDropdown();
+            showMessage('✓ เพิ่มสาขาสำเร็จ', 'success');
+        }
+
+        function updateBranchName(idx, newName) {
+            if (newName.trim() && !branches.slice(0, idx).concat(branches.slice(idx + 1)).includes(newName.trim())) {
+                branches[idx] = newName.trim();
+            }
+        }
+
+        function removeBranch(idx) {
+            if (confirm('⚠️ ลบสาขานี้ใช่หรือไม่?')) {
+                branches.splice(idx, 1);
+                renderBranches();
+                updateBranchDropdown();
+                showMessage('✓ ลบสาขาสำเร็จ', 'success');
+            }
+        }
+
+        function saveBranches() {
+            if (branches.length === 0) {
+                showMessage('❌ ต้องมีอย่างน้อย 1 สาขา', 'error');
+                return;
+            }
+            localStorage.setItem('branches', JSON.stringify(branches));
+            updateBranchDropdown();
+            showMessage('💾 บันทึกสาขาสำเร็จ', 'success');
+        }
+
+        function updateBranchDropdown() {
+            const branchSelect = document.getElementById('branch');
+            if (!branchSelect) return;
+
+            const currentValue = branchSelect.value;
+            branchSelect.innerHTML = '<option value="">-- เลือกสาขา --</option>' + 
+                branches.map(b => `<option value="${b}">${b}</option>`).join('');
+            
+            // Restore previous value if it still exists
+            if (branches.includes(currentValue)) {
+                branchSelect.value = currentValue;
+            }
+        }
+
+        // ===== CATEGORIES MANAGEMENT =====
+        function loadCategories() {
+            const saved = localStorage.getItem('inspectionCategories');
+            if (saved) {
+                inspectionCategories = JSON.parse(saved);
+            }
+        }
+
+        function renderCategories() {
+            const container = document.getElementById('categoriesList');
+            if (!container) return;
+
+            container.innerHTML = inspectionCategories.map((cat, idx) => `
+                <div style="background: #f9f9f9; padding: 12px; border-radius: 8px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center;">
+                    <div style="flex: 1;">
+                        <input type="text" value="${cat.name}" onchange="updateCategoryName(${idx}, this.value)" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; font-weight: 600;">
+                    </div>
+                    <button class="btn btn-danger btn-small" onclick="removeCategory(${idx})" style="margin-left: 10px; padding: 6px 12px; font-size: 12px;">🗑️</button>
+                </div>
+            `).join('');
+        }
+
+        function addCategory() {
+            const input = document.getElementById('newCategoryName');
+            const name = input.value.trim();
+            
+            if (!name) {
+                showMessage('กรุณาใส่ชื่อหัวข้อ', 'error');
+                return;
+            }
+
+            // Create new category object
+            const newCat = {
+                id: 'cat_' + Date.now(),
+                name: name,
+                icon: name.charAt(0),
+                subcategories: ['รายการย่อย 1', 'รายการย่อย 2']
+            };
+
+            inspectionCategories.push(newCat);
+            input.value = '';
+            renderCategories();
+            showMessage('✓ เพิ่มหัวข้อสำเร็จ', 'success');
+        }
+
+        function updateCategoryName(idx, newName) {
+            if (newName.trim()) {
+                inspectionCategories[idx].name = newName;
+            }
+        }
+
+        function removeCategory(idx) {
+            if (confirm('⚠️ ลบหัวข้อนี้ใช่หรือไม่?')) {
+                inspectionCategories.splice(idx, 1);
+                renderCategories();
+                showMessage('✓ ลบหัวข้อสำเร็จ', 'success');
+            }
+        }
+
+        function saveCategories() {
+            localStorage.setItem('inspectionCategories', JSON.stringify(inspectionCategories));
+            showMessage('💾 บันทึกหัวข้อสำเร็จ', 'success');
+            // Refresh the inspection form
+            renderInspectionForm();
+        }
+
+        // Render dynamic inspection form based on categories
+        function renderDynamicInspectionForm() {
+            const container = document.getElementById('dynamicCategoriesContainer');
+            if (!container) return;
+
+            let html = '';
+
+            inspectionCategories.forEach(category => {
+                const catId = category.id;
+                html += `
+                    <div class="content-card">
+                        <h3>${category.name}</h3>
+                `;
+
+                // Create subcategory ratings
+                (category.subcategories || []).forEach((subcat, idx) => {
+                    const ratingId = `${catId}_${idx}`;
+                    html += `
+                        <div class="rating-group">
+                            <label>${subcat}</label>
+                            <div class="rating-buttons">
+                                <button class="rating-btn good" onclick="setRating('${ratingId}', 'good', this)">✓ ดี</button>
+                                <button class="rating-btn medium" onclick="setRating('${ratingId}', 'medium', this)">△ พอใจ</button>
+                                <button class="rating-btn poor" onclick="setRating('${ratingId}', 'poor', this)">✗ ต้องปรับ</button>
+                            </div>
+                        </div>
+                    `;
+                });
+
+                // Add notes field
+                const notesId = `${catId}_notes`;
+                html += `
+                    <div class="form-group">
+                        <label>หมายเหตุ</label>
+                        <textarea id="${notesId}" placeholder="บันทึกหมายเหตุเพิ่มเติม..." rows="2"></textarea>
+                    </div>
+                </div>
+                `;
+            });
+
+            container.innerHTML = html;
+        }
+
+        function sendToGoogleSheets(inspection) {
+            const url = localStorage.getItem('appsScriptUrl');
+            if (!url) return;
+
+            fetch(url, {
+                method: 'POST',
+                body: JSON.stringify({
+                    inspection: inspection
+                })
+            }).then(res => res.json())
+              .then(data => {
+                  if (data.success) {
+                      console.log('บันทึกไป Google Sheets สำเร็จ');
+                  }
+              })
+              .catch(err => console.log('ข้อผิดพลาด:', err));
+        }
+
+        function syncToGoogleSheets() {
+            const displayData = allInspections.length > 0 ? allInspections : inspections;
+            if (displayData.length === 0) {
+                showMessage('ไม่มีข้อมูลที่จะซิงค์', 'error');
+                return;
+            }
+
+            showMessage('กำลังซิงค์ข้อมูล...', 'success');
+            let syncCount = 0;
+            displayData.forEach(inspection => {
+                sendToGoogleSheets(inspection);
+                syncCount++;
+            });
+            
+            // บันทึกเวลา sync
+            const syncTime = new Date().toLocaleString('th-TH');
+            localStorage.setItem('lastSync', syncTime);
+            document.getElementById('lastSync').textContent = syncTime;
+            
+            setTimeout(() => {
+                showMessage('✓ ซิงค์ ' + syncCount + ' รายการสำเร็จ!', 'success');
+            }, 1000);
+        }
+
+        function exportToJSON() {
+            const displayData = allInspections.length > 0 ? allInspections : inspections;
+            const dataStr = JSON.stringify(displayData, null, 2);
+            const dataBlob = new Blob([dataStr], { type: 'application/json' });
+            const url = URL.createObjectURL(dataBlob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = `QSC_${currentUser.username}_${new Date().toISOString().split('T')[0]}.json`;
+            link.click();
+            showMessage('ดาวน์โหลด JSON สำเร็จ', 'success');
+        }
+
+        function exportToExcel() {
+            const displayData = allInspections.length > 0 ? allInspections : inspections;
+            if (displayData.length === 0) {
+                showMessage('ไม่มีข้อมูลที่จะส่งออก', 'error');
+                return;
+            }
+
+            // สร้าง array สำหรับ Excel
+            const excelData = displayData.map(insp => ({
+                'วันที่': new Date(insp.date).toLocaleDateString('th-TH'),
+                'สาขา': insp.branch,
+                'Quality 1': insp.ratings.quality1,
+                'Quality 2': insp.ratings.quality2,
+                'Service 1': insp.ratings.service1,
+                'Service 2': insp.ratings.service2,
+                'Clean 1': insp.ratings.clean1,
+                'Clean 2': insp.ratings.clean2,
+                'คะแนนรวม': insp.score + '%',
+                'หมายเหตุ Quality': insp.notes.quality,
+                'หมายเหตุ Service': insp.notes.service,
+                'หมายเหตุ Cleanliness': insp.notes.cleanliness,
+                'รูปภาพ': insp.images
+            }));
+
+            const ws = XLSX.utils.json_to_sheet(excelData);
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, 'QSC Inspections');
+            XLSX.writeFile(wb, `QSC_${currentUser.username}_${new Date().toISOString().split('T')[0]}.xlsx`);
+            showMessage('ดาวน์โหลด Excel สำเร็จ', 'success');
+        }
+
+        function clearAllData() {
+            if (confirm('⚠️ นี่จะลบข้อมูลการตรวจสอบทั้งหมด คุณต้องการดำเนินการต่อใช่หรือไม่?')) {
+                if (confirm('⚠️ คุณแน่ใจหรือไม่? การกระทำนี้ไม่สามารถย้อนกลับได้')) {
+                    inspections = [];
+                    allInspections = [];
+                    localStorage.removeItem('inspections');
+                    updateHistoryTable();
+                    updateAdminStats();
+                    showMessage('ลบข้อมูลสำเร็จ', 'success');
+                }
+            }
+        }
+
+        // ===== UTILITIES =====
+        function setTodayDate() {
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('inspectionDate').value = today;
+        }
+
+        function showMessage(text, type) {
+            const msg = document.createElement('div');
+            msg.className = `message ${type}`;
+            msg.textContent = text;
+            document.body.appendChild(msg);
+
+            setTimeout(() => {
+                msg.style.animation = 'slideDown 0.3s ease reverse';
+                setTimeout(() => msg.remove(), 300);
+            }, 2000);
+        }
+
+        function closeModal() {
+            document.getElementById('detailModal').classList.remove('active');
+        }
+
+        function closeEditModal() {
+            document.getElementById('editModal').classList.remove('active');
+        }
+
+        document.addEventListener('click', function(event) {
+            const modal = document.getElementById('detailModal');
+            if (event.target === modal) {
+                closeModal();
+            }
+            const editModal = document.getElementById('editModal');
+            if (event.target === editModal) {
+                closeEditModal();
+            }
+        });
+
+        // ===== LOCAL STORAGE =====
+        function saveToLocalStorage() {
+            localStorage.setItem('inspections', JSON.stringify(inspections));
+        }
+
+        function loadFromLocalStorage() {
+            const data = localStorage.getItem('inspections');
+            if (data) {
+                inspections = JSON.parse(data);
+            }
+        }
+    </script>
+</body>
+</html>
